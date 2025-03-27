@@ -11,7 +11,8 @@ from django.contrib.auth.mixins import LoginRequiredMixin
 # Create your views here.
 
 def post_filter():
-    return Post.objects.filter(pub_date__lt=timezone.now(), is_published=True,
+    return Post.objects.filter(pub_date__lt=timezone.now(),
+                               is_published=True,
                                category__is_published=True).order_by('-pub_date')
 
 
@@ -57,7 +58,8 @@ class CategoryListView(BlogMixin, ListView):
     template_name = 'blog/category.html'
 
     def get_queryset(self):
-        return super().get_queryset().filter(category__title=get_object_or_404(
+        return super().get_queryset().filter(
+            category__title=get_object_or_404(
             Category.objects.filter(is_published=True),
             slug=self.kwargs['slug']).title
         )
@@ -65,11 +67,8 @@ class CategoryListView(BlogMixin, ListView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         context["category"] = get_object_or_404(
-            Category.objects.filter(
-                is_published=True
-            ),
-            slug=self.kwargs['slug']
-        )
+            Category.objects.filter(is_published=True),
+            slug=self.kwargs['slug'])
         return context
 
 
@@ -79,7 +78,8 @@ class PostCreateView(LoginRequiredMixin, CreateView):
     template_name = 'blog/create.html'
 
     def get_success_url(self):
-        return reverse_lazy('blog:profile', args=[self.request.user.username])
+        return reverse_lazy('blog:profile',
+                            args=[self.request.user.username])
 
     def form_valid(self, form):
         fields = form.save(commit=False)
@@ -96,11 +96,13 @@ class PostUpdateView(UpdateView):
     def dispatch(self, request, *args, **kwargs):
         obj = self.get_object()
         if obj.author != self.request.user:
-            return redirect('blog:post_detail', pk=self.kwargs['pk'])
+            return redirect('blog:post_detail',
+                            pk=self.kwargs['pk'])
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('blog:post_detail', args=[self.kwargs['pk']])
+        return reverse_lazy('blog:post_detail',
+                            args=[self.kwargs['pk']])
 
     def form_valid(self, form):
         form.save()
@@ -149,7 +151,8 @@ class CommentCreateView(LoginRequiredMixin, CreateView):
         return super().form_valid(form)
 
     def get_success_url(self):
-        return reverse('blog:post_detail', kwargs={'pk': self.current_post.pk})
+        return reverse('blog:post_detail',
+                       kwargs={'pk': self.current_post.pk})
 
 
 class CommentUpdateView(LoginRequiredMixin, UpdateView):
@@ -210,13 +213,15 @@ class PostDeleteView(LoginRequiredMixin, DeleteView):
         return super().dispatch(request, *args, **kwargs)
 
     def get_success_url(self):
-        return reverse_lazy('blog:profile', args=[self.request.user.username])
+        return reverse_lazy('blog:profile',
+                            args=[self.request.user.username])
 
 
 @login_required
 def edit_profile(request):
     template_name = 'blog/user.html'
-    form = ProfileChangeForm(request.POST or None, instance=request.user)
+    form = ProfileChangeForm(request.POST or None,
+                             instance=request.user)
     context = {'form': form}
     if form.is_valid():
         form.save()

@@ -52,8 +52,10 @@ class Post(models.Model):
         help_text='Снимите галочку, чтобы скрыть публикацию.')
     created_at = models.DateTimeField(auto_now_add=True)
 
-    comment_count = models.IntegerField('Количество комментариев', default=0)
-    image = models.ImageField('Фото', upload_to='post_images', blank=True, null=True)
+    comment_count = models.IntegerField('Количество комментариев',
+                                        default=0)
+    image = models.ImageField('Фото', upload_to='post_images',
+                              blank=True, null=True)
 
     class Meta:
         verbose_name = 'публикация'
